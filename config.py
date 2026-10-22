@@ -2,8 +2,8 @@
 # Sau khi đăng ký tại https://sandbox.vnpayment.vn/devreg/
 # Các bạn mở email và dán 2 thông tin nhận được vào đây:
 
-VNPAY_TMN_CODE = "NO7PITLV"
-VNPAY_HASH_SECRET = "LFFCHZFXSWYJRMEQQFIOIFGSNRRRFLVG"
+VNPAY_TMN_CODE = ""
+VNPAY_HASH_SECRET = ""
 
 # Các URL mặc định của hệ thống Sandbox (giữ nguyên)
 VNPAY_PAYMENT_URL = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
