@@ -3,120 +3,164 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kết quả thanh toán đơn hàng</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta name="color-scheme" content="light">
+  <title>Kết quả giao dịch | VNStore Sandbox</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body { background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    .receipt-card { border-radius: 16px; border: none; overflow: hidden; background: #fff; }
-    .status-icon {
-      width: 72px; height: 72px; border-radius: 50%;
-      display: inline-flex; align-items: center; justify-content: center;
-      font-size: 32px; margin-bottom: 12px;
-    }
+    :root{--ink:#10213b;--sub:#718199;--line:#e5ecf5;--bg:#f5f8fd;--blue:#145feb;--green:#12966b;--yellow:#b2760b;--red:#d53d4a}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 Inter,system-ui,sans-serif}
+    button{font:inherit}a{text-decoration:none;color:inherit}.shell{max-width:940px;padding:0 22px;margin:auto}
+    .nav{background:#fff;border-bottom:1px solid var(--line)}.nav-inner{min-height:76px;display:flex;align-items:center;justify-content:space-between}
+    .brand{display:inline-flex;align-items:center;gap:11px;font-size:21px;font-weight:800;letter-spacing:-.7px}
+    .brand-icon{width:39px;height:39px;border-radius:11px;background:linear-gradient(130deg,#1477ff,#0b49ba);color:#fff;display:grid;place-items:center}
+    svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+    .env{border:1px solid #cbdffa;color:#215fae;background:#eff6ff;border-radius:999px;padding:7px 12px;font-size:11px;font-weight:800;letter-spacing:.4px}
+    .wrap{max-width:720px;margin:0 auto;padding:45px 18px 70px}
+    .crumbs{text-align:center;color:#91a0b5;font-weight:600;font-size:12px;margin-bottom:19px}.crumbs strong{color:#3b70c5}
+    .card{overflow:hidden;border:1px solid #e6edf6;background:#fff;border-radius:22px;box-shadow:0 18px 55px rgba(23,52,92,.075)}
+    .hero{padding:38px 30px 31px;text-align:center;background:linear-gradient(130deg,#f4f7fc,#eef3fa);border-bottom:1px solid #edf1f7}
+    .status-orb{width:78px;height:78px;display:grid;place-items:center;border-radius:23px;background:#dce8fa;color:#3576cd;margin:0 auto 17px;box-shadow:0 8px 22px rgba(18,54,115,.065)}
+    .status-orb svg{width:39px;height:39px}.hero h1{font-size:25px;margin:0 0 8px;letter-spacing:-.8px;line-height:1.3}
+    .hero p{font-size:13px;max-width:490px;color:#62738a;margin:0 auto}.status-pill{display:inline-flex;gap:7px;align-items:center;padding:6px 11px;font-size:11px;font-weight:800;border-radius:999px;background:#fff;border:1px solid #dfe6f2;color:#5e718b;margin:17px auto 0}
+    .hero.success{background:linear-gradient(135deg,#f1fcf7,#e2f7ed)}.hero.success .status-orb{background:#c5f0db;color:#087d53}.hero.success .status-pill{color:#0b8459;border-color:#bce9d2;background:#f4fff9}
+    .hero.warning{background:linear-gradient(135deg,#fffbf0,#fff2d9)}.hero.warning .status-orb{background:#ffebae;color:#976207}.hero.warning .status-pill{color:#98660c;border-color:#f5dfb0;background:#fffaf1}
+    .hero.error{background:linear-gradient(135deg,#fff8f8,#ffeded)}.hero.error .status-orb{background:#ffd7d9;color:#c63845}.hero.error .status-pill{color:#bd2d3e;border-color:#ffd1d4;background:#fff8f9}
+    .inner{padding:27px 32px 31px}.section-title{font-size:15px;font-weight:800;margin:0 0 14px;letter-spacing:-.25px}
+    .receipt{border:1px solid var(--line);background:#fbfcff;border-radius:15px;padding:8px 19px;margin-bottom:22px}
+    .info-row{display:flex;justify-content:space-between;gap:18px;align-items:center;padding:14px 0;border-bottom:1px solid #e8edf4;font-size:12px}
+    .info-row:last-child{border:0}.info-row span{color:#708098}.info-row strong{color:#1d304d;text-align:right;font-weight:700;overflow-wrap:anywhere}
+    .info-row strong.money{font-size:19px;color:#155de2;letter-spacing:-.45px}
+    .secure{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:7px;background:#edf3fa;color:#547291;font-size:11px;font-weight:750;text-align:left}
+    .secure.ok{background:#e9f8ef;color:#12815b}.secure.bad{background:#ffedef;color:#c1333f}
+    .technical{display:flex;gap:11px;background:#f0f6ff;border:1px solid #dbe8fc;color:#466285;font-size:12px;padding:15px;border-radius:11px;margin-bottom:21px}
+    .technical strong{color:#254978}.tech-icon{font-weight:900;color:#1462df}
+    .actions{display:flex;gap:11px}.button{border:1px solid #d9e3ef;border-radius:11px;display:inline-flex;gap:8px;align-items:center;justify-content:center;padding:13px 16px;font-weight:750;cursor:pointer;text-decoration:none;font-size:13px;flex:1;background:#fff;color:#416081}
+    .button.primary{background:linear-gradient(110deg,#126cf0,#0c50d2);color:#fff;border-color:#1264e8;box-shadow:0 8px 18px rgba(19,87,201,.12)}
+    .button:disabled{opacity:.6;cursor:wait}.button:hover:not(:disabled){filter:brightness(.98)}
+    .foot{text-align:center;margin:23px 0 0;color:#94a2b5;font-size:11px}
+    @media(max-width:570px){.shell{padding:0 15px}.wrap{padding:28px 14px 50px}.hero{padding:31px 20px 26px}.hero h1{font-size:21px}.inner{padding:23px 17px 25px}.receipt{padding:7px 13px}.info-row{gap:10px}.actions{flex-direction:column}.env{display:none}}
   </style>
 </head>
-<body class="py-5">
-  <div class="container" style="max-width: 580px;">
-    <div class="receipt-card shadow-sm">
-      
-      <!-- Banner Trạng Thái -->
-      <div id="statusBanner" class="p-4 text-center text-white bg-secondary">
-        <div id="statusIconWrap" class="status-icon bg-white bg-opacity-25">
-          <i id="statusIcon" class="fa-solid fa-circle-notch fa-spin"></i>
-        </div>
-        <h4 id="statusTitle" class="fw-bold mb-1">Đang xử lý giao dịch</h4>
-        <p id="statusSub" class="mb-0 opacity-75 small">Đang đối soát chữ ký số từ VNPAY...</p>
+<body>
+<header class="nav"><div class="shell nav-inner"><a href="/" class="brand"><span class="brand-icon"><svg viewBox="0 0 24 24"><path d="M4 9h16l-1 11H5L4 9Z"/><path d="M9 9V7a3 3 0 0 1 6 0v2"/></svg></span>VNStore</a><span class="env">VNPAY SANDBOX • DEMO</span></div></header>
+<main class="wrap">
+  <div class="crumbs">Thanh toán / <strong>Tra cứu kết quả giao dịch</strong></div>
+  <div class="card">
+    <section class="hero" id="hero" aria-live="polite">
+      <div class="status-orb" id="statusOrb"><svg viewBox="0 0 24 24" id="statusSvg"><path d="M12 3v4m0 10v4M3 12h4m10 0h4M5.6 5.6l2.9 2.9m7 7 2.9 2.9m0-12.8-2.9 2.9m-7 7-2.9 2.9"/></svg></div>
+      <h1 id="statusTitle">Đang xác minh giao dịch</h1>
+      <p id="statusDescription">Hệ thống đang kiểm tra dữ liệu VNPAY và trạng thái đơn hàng trên máy chủ.</p>
+      <span class="status-pill" id="statusPill">● Đang kiểm tra</span>
+    </section>
+    <div class="inner">
+      <h2 class="section-title">Chi tiết giao dịch</h2>
+      <div class="receipt">
+        <div class="info-row"><span>Mã đơn hàng</span><strong id="orderId">Đang xác minh...</strong></div>
+        <div class="info-row"><span>Mã giao dịch VNPAY</span><strong id="transactionNo">—</strong></div>
+        <div class="info-row"><span>Ngân hàng thanh toán</span><strong id="bankCode">—</strong></div>
+        <div class="info-row"><span>Số tiền</span><strong id="amount" class="money">—</strong></div>
+        <div class="info-row"><span>Kiểm tra dữ liệu</span><strong class="secure" id="secureStatus">Đang xác minh...</strong></div>
+        <div class="info-row"><span>Trạng thái trên máy chủ</span><strong id="dbStatus">Đang tải...</strong></div>
       </div>
-
-      <div class="p-4">
-        <!-- Thông tin hóa đơn chi tiết -->
-        <div class="border rounded-3 p-3 bg-light mb-4">
-          <div class="d-flex justify-content-between py-2 border-bottom">
-            <span class="text-muted small">Mã hóa đơn:</span>
-            <span class="fw-bold" id="resOrderId">-</span>
-          </div>
-          <div class="d-flex justify-content-between py-2 border-bottom">
-            <span class="text-muted small">Mã giao dịch VNPAY:</span>
-            <span class="fw-bold" id="resTxnNo">-</span>
-          </div>
-          <div class="d-flex justify-content-between py-2 border-bottom">
-            <span class="text-muted small">Ngân hàng thanh toán:</span>
-            <span class="fw-bold" id="resBank">-</span>
-          </div>
-          <div class="d-flex justify-content-between py-2 border-bottom">
-            <span class="text-muted small">Số tiền thanh toán:</span>
-            <span class="fw-bold text-primary fs-5" id="resAmount">-</span>
-          </div>
-          <div class="d-flex justify-content-between py-2">
-            <span class="text-muted small">Chữ ký bảo mật (Checksum):</span>
-            <span class="badge bg-secondary" id="resHash">Đang xác thực...</span>
-          </div>
-        </div>
-
-        <div class="d-grid gap-2">
-          <a href="/" class="btn btn-primary py-2 fw-semibold">
-            <i class="fa-solid fa-arrow-left me-2"></i> Quay lại cửa hàng
-          </a>
-        </div>
-      </div>
-
+      <div class="technical" role="status"><span class="tech-icon">ⓘ</span><div><strong>Minh bạch trạng thái thanh toán.</strong><br><span id="technicalNote">Return URL được xác minh trước khi hiển thị. Trạng thái thanh toán chính thức được ghi nhận qua IPN.</span></div></div>
+      <div class="actions"><a class="button primary" href="/"><svg viewBox="0 0 24 24"><path d="m12 19-7-7 7-7M5 12h14"/></svg> Về cửa hàng</a><button class="button" id="refreshBtn" type="button"><svg viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.5 9A7 7 0 0 1 18 7l2 5M4 12l2 5a7 7 0 0 0 12.5-2"/></svg> Kiểm tra lại</button></div>
     </div>
   </div>
-
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const responseCode = params.get("vnp_ResponseCode");
-    const orderId = params.get("vnp_TxnRef") || "N/A";
-    const txnNo = params.get("vnp_TransactionNo") || "N/A";
-    const bank = params.get("vnp_BankCode") || "N/A";
-    const rawAmount = params.get("vnp_Amount");
-
-    document.getElementById("resOrderId").innerText = orderId;
-    document.getElementById("resTxnNo").innerText = txnNo;
-    document.getElementById("resBank").innerText = bank;
-    document.getElementById("resAmount").innerText = rawAmount 
-      ? (Number(rawAmount) / 100).toLocaleString("vi-VN") + " VNĐ" 
-      : "0 VNĐ";
-
-    const banner = document.getElementById("statusBanner");
-    const icon = document.getElementById("statusIcon");
-    const title = document.getElementById("statusTitle");
-    const sub = document.getElementById("statusSub");
-    const resHash = document.getElementById("resHash");
-
-    // Xác thực chữ ký số bảo mật từ backend
-    fetch(`/api/payment/verify?${params.toString()}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.is_valid) {
-          resHash.className = "badge bg-success";
-          resHash.innerText = "Hợp lệ (HMAC-SHA512 OK)";
-
-          if (responseCode === "00") {
-            banner.className = "p-4 text-center text-white bg-success";
-            icon.className = "fa-solid fa-check";
-            title.innerText = "Thanh Toán Thành Công!";
-            sub.innerText = "Đơn hàng của bạn đã được ghi nhận vào hệ thống.";
-          } else {
-            banner.className = "p-4 text-center text-white bg-warning text-dark";
-            icon.className = "fa-solid fa-triangle-exclamation";
-            title.innerText = "Giao Dịch Đã Bị Hủy";
-            sub.innerText = `Mã lỗi VNPAY: ${responseCode}`;
-          }
-        } else {
-          resHash.className = "badge bg-danger";
-          resHash.innerText = "Sai lệch (Bị chỉnh sửa)";
-          banner.className = "p-4 text-center text-white bg-danger";
-          icon.className = "fa-solid fa-circle-xmark";
-          title.innerText = "Cảnh Báo: Chữ Ký Không Hợp Lệ!";
-          sub.innerText = "Dữ liệu giao dịch có dấu hiệu bị can thiệp trái phép.";
-        }
-      })
-      .catch(() => {
-        resHash.className = "badge bg-danger";
-        resHash.innerText = "Lỗi kết nối";
-      });
-  </script>
+  <p class="foot">VNStore Seminar Demo · Kết quả hiển thị dựa trên xác minh tại backend</p>
+</main>
+<script>
+  const $ = id => document.getElementById(id);
+  const qs = new URLSearchParams(location.search);
+  const icons = {
+    pending: '<path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="9"/>',
+    success: '<path d="m5 12 4 4L19 6"/><circle cx="12" cy="12" r="10"/>',
+    warning: '<path d="M12 9v4m0 4h.01"/><path d="M10.3 4.8 2.5 18.5a1.6 1.6 0 0 0 1.4 2.4h16.2a1.6 1.6 0 0 0 1.4-2.4L13.7 4.8a2 2 0 0 0-3.4 0Z"/>',
+    error: '<circle cx="12" cy="12" r="10"/><path d="m8 8 8 8M16 8l-8 8"/>'
+  };
+  const statusText = {PENDING:'Chờ IPN',PAID:'Đã thanh toán (PAID)',FAILED:'Thất bại (FAILED)',REVIEW:'Cần đối soát (REVIEW)'};
+  let verifiedOrderId = null;
+  let pollTimer = null;
+  let attempts = 0;
+  const maxAttempts = 30;
+  function setView(type, title, description, pill) {
+    $('hero').className = 'hero ' + type;
+    $('statusSvg').innerHTML = icons[type] || icons.pending;
+    $('statusTitle').textContent = title;
+    $('statusDescription').textContent = description;
+    $('statusPill').textContent = pill;
+  }
+  function showDatabaseStatus(status) {
+    $('dbStatus').textContent = statusText[status] || status || 'Chưa xác định';
+    if (status === 'PAID') {
+      setView('success','Thanh toán đã được xác nhận','IPN hợp lệ đã được máy chủ xử lý và trạng thái đơn hàng là PAID.','✓ Đã thanh toán');
+      $('technicalNote').textContent = 'Đơn hàng đã được cập nhật trong CSDL theo kết quả IPN.';
+      stopPolling();
+    } else if (status === 'FAILED') {
+      setView('warning','Giao dịch không thành công','Máy chủ đã nhận kết quả IPN và cập nhật trạng thái FAILED.','! Không thành công');
+      stopPolling();
+    } else if (status === 'REVIEW') {
+      setView('warning','Giao dịch cần đối soát','Hệ thống nhận trạng thái cần kiểm tra thêm; không tự động ghi nhận đã thanh toán.','! Cần kiểm tra');
+      stopPolling();
+    } else {
+      setView('warning','Đang chờ xác nhận IPN','Dữ liệu phản hồi đã được kiểm tra, nhưng đơn hàng chưa có xác nhận thanh toán chính thức từ IPN.','● Chờ xác nhận');
+    }
+  }
+  function stopPolling() { if (pollTimer) clearInterval(pollTimer); pollTimer = null; }
+  async function refreshOrder() {
+    if (!verifiedOrderId) return;
+    const response = await fetch('/api/orders/' + encodeURIComponent(verifiedOrderId), {cache:'no-store'});
+    if (!response.ok) throw new Error('Không truy vấn được trạng thái đơn hàng');
+    const order = await response.json();
+    showDatabaseStatus(order.status);
+  }
+  function startPolling() {
+    stopPolling(); attempts = 0;
+    pollTimer = setInterval(async () => {
+      if (++attempts > maxAttempts) {
+        stopPolling();
+        $('technicalNote').textContent = 'Chưa thấy IPN. Bạn có thể nhấn “Kiểm tra lại”, kiểm tra cấu hình URL IPN hoặc dùng API tra cứu đơn hàng.';
+        return;
+      }
+      try { await refreshOrder(); } catch (_) { /* Không báo đã thanh toán nếu mạng gián đoạn. */ }
+    }, 3000);
+  }
+  async function initialize() {
+    $('refreshBtn').disabled = true;
+    try {
+      if (!qs.has('vnp_SecureHash') || !qs.has('vnp_TxnRef')) throw new Error('Thiếu thông tin phản hồi VNPAY.');
+      const response = await fetch('/api/payment/verify?' + qs.toString(), {cache:'no-store'});
+      if (!response.ok) throw new Error('Máy chủ không thể xác minh giao dịch.');
+      const data = await response.json();
+      if (!data.is_valid) throw new Error('HMAC, mã đơn hàng, merchant hoặc số tiền không hợp lệ.');
+      verifiedOrderId = data.txn_ref;
+      $('orderId').textContent = data.txn_ref;
+      $('transactionNo').textContent = data.vnp_transaction_no || qs.get('vnp_TransactionNo') || '—';
+      $('bankCode').textContent = qs.get('vnp_BankCode') || 'Chọn tại cổng VNPAY';
+      $('amount').textContent = Number(data.amount_vnd).toLocaleString('vi-VN') + ' ₫';
+      $('secureStatus').className = 'secure ok';
+      $('secureStatus').textContent = '✓ HMAC & thông tin đơn hợp lệ';
+      showDatabaseStatus(data.order_status);
+      if (data.order_status === 'PENDING') startPolling();
+    } catch (error) {
+      stopPolling(); verifiedOrderId = null;
+      $('orderId').textContent = 'Chưa xác minh';
+      $('secureStatus').className = 'secure bad';
+      $('secureStatus').textContent = '✕ Chưa xác minh';
+      $('dbStatus').textContent = 'UNVERIFIED';
+      setView('error','Không thể xác minh giao dịch','Không ghi nhận thanh toán. ' + error.message,'✕ Không hợp lệ');
+      $('technicalNote').textContent = 'Không dùng dữ liệu trên URL làm bằng chứng thanh toán nếu backend chưa xác minh.';
+    } finally { $('refreshBtn').disabled = !verifiedOrderId; }
+  }
+  $('refreshBtn').addEventListener('click', async () => {
+    if (!verifiedOrderId) return;
+    $('refreshBtn').disabled = true;
+    try { await refreshOrder(); } catch (_) {
+      $('technicalNote').textContent = 'Không thể tải trạng thái lúc này; không kết luận đã thanh toán.';
+    } finally { $('refreshBtn').disabled = false; }
+  });
+  initialize();
+</script>
 </body>
 </html>

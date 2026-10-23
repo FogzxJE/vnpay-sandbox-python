@@ -1,61 +1,45 @@
+"""Tạo URL và xác minh chữ ký VNPAY v2.1.0."""
 import hashlib
 import hmac
-import urllib.parse
+from urllib.parse import quote_plus
 
 
 class VNPay:
+    def __init__(self, tmn_code: str, hash_secret: str, payment_url: str, return_url: str):
+        self.tmn_code = tmn_code
+        self.hash_secret = hash_secret
+        self.payment_url = payment_url
+        self.return_url = return_url
 
-  def __init__(
-      self,
-      tmn_code: str,
-      hash_secret: str,
-      payment_url: str,
-      return_url: str,
-  ):
-    self.tmn_code = tmn_code
-    self.hash_secret = hash_secret
-    self.payment_url = payment_url
-    self.return_url = return_url
+    @staticmethod
+    def canonical_query(params: dict) -> str:
+        """Sắp xếp key A-Z, encode value theo application/x-www-form-urlencoded."""
+        pairs = sorted(
+            (k, str(v)) for k, v in params.items()
+            if k.startswith('vnp_')
+            and k not in ('vnp_SecureHash', 'vnp_SecureHashType')
+            and v is not None and str(v) != ''
+        )
+        return '&'.join(f'{k}={quote_plus(v, safe="")}' for k, v in pairs)
 
-  def build_payment_url(self, params: dict) -> str:
-    # 1. Sắp xếp tham số A-Z và loại bỏ giá trị rỗng
-    sorted_params = sorted([
-        (k, v) for k, v in params.items() if v is not None and str(v) != ''
-    ])
+    def sign_params(self, params: dict) -> str:
+        content = self.canonical_query(params).encode('utf-8')
+        return hmac.new(self.hash_secret.encode('utf-8'), content, hashlib.sha512).hexdigest()
 
-    # 2. Tạo chuỗi query string
-    query_parts = [
-        f'{k}={urllib.parse.quote_plus(str(v))}' for k, v in sorted_params
-    ]
-    query_string = '&'.join(query_parts)
+    def build_payment_url(self, params: dict) -> str:
+        if not self.tmn_code or not self.hash_secret:
+            raise ValueError('Sandbox credentials are missing')
+        query = self.canonical_query(params)
+        signature = self.sign_params(params)
+        return f'{self.payment_url}?{query}&vnp_SecureHash={signature}'
 
-    # 3. Tạo chữ ký băm HMAC-SHA512
-    secure_hash = hmac.new(
-        self.hash_secret.encode('utf-8'),
-        query_string.encode('utf-8'),
-        hashlib.sha512,
-    ).hexdigest()
-
-    return f'{self.payment_url}?{query_string}&vnp_SecureHash={secure_hash}'
-
-  def validate_response(self, response_params: dict) -> bool:
-    received_hash = response_params.get('vnp_SecureHash', '')
-    valid_params = {
-        k: v
-        for k, v in response_params.items()
-        if k.startswith('vnp_') and k not in ['vnp_SecureHash', 'vnp_SecureHashType']
-    }
-    sorted_params = sorted(valid_params.items())
-    query_string = '&'.join([
-        f'{k}={urllib.parse.quote_plus(str(v))}'
-        for k, v in sorted_params
-        if v is not None and str(v) != ''
-    ])
-
-    calculated_hash = hmac.new(
-        self.hash_secret.encode('utf-8'),
-        query_string.encode('utf-8'),
-        hashlib.sha512,
-    ).hexdigest()
-
-    return received_hash.lower() == calculated_hash.lower()
+    def validate_response(self, params: dict) -> bool:
+        incoming = params.get('vnp_SecureHash', '')
+        if not self.hash_secret or len(incoming) != 128:
+            return False
+        try:
+            bytes.fromhex(incoming)
+        except ValueError:
+            return False
+        expected = self.sign_params(params)
+        return hmac.compare_digest(incoming.lower(), expected.lower())

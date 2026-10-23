@@ -1,0 +1,26 @@
+# Thông tin bảo mật
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Database
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Hệ điều hành và log
+.DS_Store
+Thumbs.db
+*.log
+
+# File cấu hình ngrok cá nhân
+ngrok.yml
+ngrok.yaml
