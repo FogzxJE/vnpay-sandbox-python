@@ -24,7 +24,7 @@ printf '  VNPAY SANDBOX - ONE CLICK macOS\n'
 printf '  Chế độ: %s\n' "$MODE"
 printf '========================================================\n\n'
 
-[ -f "main.py" ] || fail "Không thấy main.py. Giữ các file .command cạnh main.py trong thư mục dự án."
+[ -f "main.py" ] || fail "Không thấy main.py. Giữ thư mục launcher/ bên trong thư mục dự án (cùng cấp main.py)."
 
 if [ "$MODE" = "--stop" ]; then
   if [ -x ".venv/bin/python" ]; then
