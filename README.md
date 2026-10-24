@@ -103,19 +103,7 @@ Truy cập:
 
 Lưu ý: Demo offline là phương án dự phòng nếu đường truyền/tunnel hoặc việc đăng ký IPN với VNPAY bị gián đoạn.
 
-## 5. Những điểm kỹ thuật giảng viên có thể hỏi
-
-| Câu hỏi | Câu trả lời kỹ thuật |
-|---|---|
-| HMAC đúng có chắc thanh toán thành công không? | Không. HMAC chỉ xác minh thông điệp và tính toàn vẹn; còn phải kiểm tra đơn hàng, merchant, số tiền, response code và transaction status, IPN và DB. |
-| Vì sao dùng `vnp_Amount = amount * 100`? | Quy ước API của VNPAY; 50.000 VNĐ được gửi là `5000000`. |
-| Vì sao Return URL không cập nhật DB? | Đây là front-channel; trình duyệt có thể bị tắt hoặc tham số URL có thể bị sử dụng lại. Server nhận IPN để xử lý trạng thái độc lập với browser. |
-| IPN đến 2 lần thì sao? | DB chỉ xử lý trạng thái `PENDING` lần đầu. Các lần sau trả `RspCode=02` (đã xử lý). |
-| Nếu số tiền sai hoặc signature sai? | Không cập nhật DB; lần lượt phản hồi IPN `04` hoặc `97`. |
-| Vì sao cần SQLite? | Demo trạng thái thật, không phải hiển thị giả trên trình duyệt. Trên production cần DB, audit log, quản trị khóa, HTTPS, reconciliation... |
-| Nếu IPN thất lạc? | VNPAY có retry tùy mã RspCode; với tình huống quá thời gian/chưa rõ trạng thái cần QueryDr và đối soát. QueryDr **chưa được lập trình** trong demo này. |
-
-## 6. Mô hình dữ liệu & endpoints
+## 5. Mô hình dữ liệu & endpoints
 
 Bảng `orders` có `order_id`, `amount_vnd`, `status` (`PENDING`, `PAID`, `FAILED`, `REVIEW`), `created_at`, `response_code`, `transaction_status`, `vnp_transaction_no`. Database SQLite sinh tự động ở `orders.db` và đã được `.gitignore` loại bỏ khỏi Git.
 
@@ -130,17 +118,6 @@ Bảng `orders` có `order_id`, `amount_vnd`, `status` (`PENDING`, `PAID`, `FAIL
 | GET | `/docs` | Swagger API docs |
 
 **Về bảo mật:** `hmac.compare_digest()` tránh so sánh chuỗi chữ ký theo cách thông thường; kiểm tra tham số URL lặp; đơn hàng và tiền lấy từ server; SQL parameterized; SQLite transaction (`BEGIN IMMEDIATE`) ngăn đua ghi trạng thái. Trên môi trường production còn phải có xác thực, chống lạm dụng, HTTPS, kiểm tra yêu cầu đến, logs, giới hạn tốc độ, lưu lịch sử và đối soát.
-
-## 7. Chấm phần seminar / vật phẩm bàn giao
-
-- [ ] Slide có WHAT – WHY – HOW – WHEN, kiến trúc request → VNPAY → Return/IPN → SQLite.
-- [ ] Slide nêu khác biệt checksum / kết quả gateway / trạng thái đơn hàng backend.
-- [ ] Trình chiếu code `vnpay.py` (HMAC), `main.py` (tạo URL, IPN), `tests/test_payment.py`.
-- [ ] Demo ít nhất 4 trường hợp: thành công, sai chữ ký, sai số tiền, callback lặp.
-- [ ] Chia sẻ GitHub/ZIP, README, `.env.example`, toàn bộ file templates và test để cả lớp dùng được.
-- [ ] Video bài giảng >= 20 phút (xem hướng dẫn Seminar), quay đủ terminal + browser + giải thích từng ca.
-- [ ] Chia sẻ tài liệu kỹ thuật trước 3 ngày nếu có thể; kiểm tra từ cửa sổ ẩn danh để bảo đảm repo tải được.
-- [ ] Không xuất bản `.env`, database có dữ liệu giao dịch, secret, hoặc OTP thật.
 
 ---
 
