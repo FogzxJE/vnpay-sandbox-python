@@ -34,7 +34,6 @@ vnpay_seminar_hoan_thien/
 ├── .gitignore             # Chặn đăng bí mật/database lên GitHub
 ├── requirements.txt
 ├── simulate_ipn.py        # Mô phỏng IPN CÓ KÝ, local only
-├── tests/test_payment.py  # 11 ca test (không cần gọi VNPAY)
 └── templates/
     ├── index.html         # Giữ giao diện VNStore ban đầu
     └── result.html        # Hiển thị từ backend, không tin URL ngay
