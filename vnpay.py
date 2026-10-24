@@ -42,4 +42,4 @@ class VNPay:
         except ValueError:
             return False
         expected = self.sign_params(params)
-        return hmac.compare_digest(incoming.lower(), expected.lower())
+        return hmac.compare_digest(incoming.lower(), expected.lower()) 
