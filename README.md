@@ -84,36 +84,7 @@ Truy cập:
 | Frontend tải thiếu icon/style | Internet/CDN của Bootstrap và FontAwesome đang bị chặn; backend vẫn xử lý được |
 | Thanh toán về trang kết quả nhưng hiển thị `PENDING` | Nếu chưa cấu hình HTTPS IPN công khai thì đây là điều bình thường, **không phải đã thanh toán được xác nhận** |
 
-## 4. Demo Offline: KHÔNG cần Internet hay thanh toán qua VNPAY
-
-**Mục tiêu:** để cả lớp chạy được ngay, kể cả IPN chưa được VNPAY cấu hình.
-
-**Cách A — pytest:** chạy `.\.venv\Scripts\python.exe -m pytest -v`. Kiểm tra 11 ca: trang chủ, tạo đơn, cấm sửa giá, Return không đánh dấu PAID, IPN thành công, IPN lặp, HMAC sai, tiền sai, mã đơn không tồn tại, merchant sai, giao dịch thất bại, pending và tham số URL lặp (xem `tests/test_payment.py`; bài test gộp một số tình huống).
-
-**Cách B — quan sát SQLite chuyển trạng thái (PowerShell):**
-
-1. Mở server FastAPI ở một terminal.
-2. Mở terminal PowerShell thứ hai, lấy 1 đơn mới và mã đơn:
-
-```powershell
-$resp = Invoke-RestMethod -Uri http://127.0.0.1:8000/api/payment/create-url -Method POST -ContentType 'application/json' -Body '{"bank_code":"NCB"}'
-$resp | Select-Object order_id,amount_vnd
-$oid = $resp.order_id
-Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/orders/$oid"
-```
-
-Trạng thái ban đầu là `PENDING`. Sau đó gửi IPN mô phỏng đã ký:
-
-```powershell
-.\.venv\Scripts\python.exe simulate_ipn.py $oid --status success
-Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/orders/$oid"
-```
-
-Kỳ vọng: IPN nhận `RspCode=00`, SQLite đổi `PENDING -> PAID`. Chạy lại **cùng lệnh**, IPN phải trả `RspCode=02` và không ghi trùng. Đổi `--status cancel`, `review`, `pending` trên **đơn mới** để xem các trạng thái khác.
-
-> IPN mô phỏng **không phải** thông báo của VNPAY thật và không chứng minh đã phát sinh giao dịch. Bản demo dùng Hash Secret cục bộ để giải thích quy trình xác minh chữ ký và trạng thái.
-
-## 5. Demo Online: VNPAY Sandbox thực tế
+## 4. Demo Online: VNPAY Sandbox thực tế
 
 1. Tạo tài khoản/credential Sandbox trên <https://sandbox.vnpayment.vn/devreg/>. **Chuẩn bị trước buổi học**, vì đăng ký nhận email/xác nhận có thể mất thời gian.
 2. Điền `.env` với credentials thực được cấp (không dùng các giá trị placeholder) và chạy server.
@@ -132,7 +103,7 @@ Kỳ vọng: IPN nhận `RspCode=00`, SQLite đổi `PENDING -> PAID`. Chạy l�
 
 Lưu ý: Demo offline là phương án dự phòng nếu đường truyền/tunnel hoặc việc đăng ký IPN với VNPAY bị gián đoạn.
 
-## 6. Những điểm kỹ thuật giảng viên có thể hỏi
+## 5. Những điểm kỹ thuật giảng viên có thể hỏi
 
 | Câu hỏi | Câu trả lời kỹ thuật |
 |---|---|
@@ -144,7 +115,7 @@ Lưu ý: Demo offline là phương án dự phòng nếu đường truyền/tunn
 | Vì sao cần SQLite? | Demo trạng thái thật, không phải hiển thị giả trên trình duyệt. Trên production cần DB, audit log, quản trị khóa, HTTPS, reconciliation... |
 | Nếu IPN thất lạc? | VNPAY có retry tùy mã RspCode; với tình huống quá thời gian/chưa rõ trạng thái cần QueryDr và đối soát. QueryDr **chưa được lập trình** trong demo này. |
 
-## 7. Mô hình dữ liệu & endpoints
+## 6. Mô hình dữ liệu & endpoints
 
 Bảng `orders` có `order_id`, `amount_vnd`, `status` (`PENDING`, `PAID`, `FAILED`, `REVIEW`), `created_at`, `response_code`, `transaction_status`, `vnp_transaction_no`. Database SQLite sinh tự động ở `orders.db` và đã được `.gitignore` loại bỏ khỏi Git.
 
@@ -160,7 +131,7 @@ Bảng `orders` có `order_id`, `amount_vnd`, `status` (`PENDING`, `PAID`, `FAIL
 
 **Về bảo mật:** `hmac.compare_digest()` tránh so sánh chuỗi chữ ký theo cách thông thường; kiểm tra tham số URL lặp; đơn hàng và tiền lấy từ server; SQL parameterized; SQLite transaction (`BEGIN IMMEDIATE`) ngăn đua ghi trạng thái. Trên môi trường production còn phải có xác thực, chống lạm dụng, HTTPS, kiểm tra yêu cầu đến, logs, giới hạn tốc độ, lưu lịch sử và đối soát.
 
-## 8. Chấm phần seminar / vật phẩm bàn giao
+## 7. Chấm phần seminar / vật phẩm bàn giao
 
 - [ ] Slide có WHAT – WHY – HOW – WHEN, kiến trúc request → VNPAY → Return/IPN → SQLite.
 - [ ] Slide nêu khác biệt checksum / kết quả gateway / trạng thái đơn hàng backend.
