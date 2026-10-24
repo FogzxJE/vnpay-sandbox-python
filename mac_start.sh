@@ -67,7 +67,7 @@ PY="${ROOT}/.venv/bin/python"
 "$PY" -c 'import sys; sys.exit(0 if sys.version_info >= (3,10) else 1)' || fail "Python trong .venv quá cũ. Đổi tên .venv rồi chạy lại."
 
 printf '[2/3] Đang kiểm tra thư viện...\n'
-if ! "$PY" -c 'import fastapi, uvicorn, dotenv, httpx, pytest' >/dev/null 2>&1; then
+if ! "$PY" -c 'import fastapi, uvicorn, dotenv' >/dev/null 2>&1; then
   printf '[INFO] Cài đặt từ requirements.txt (lần đầu cần Internet).\n'
   "$PY" -m pip install -r requirements.txt || fail "Cài thư viện thất bại. Kiểm tra Internet và thông báo pip ở trên."
 fi
