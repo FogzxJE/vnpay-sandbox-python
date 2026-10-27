@@ -53,7 +53,7 @@ vnpay-sandbox-python/
 
 **Những file có thể sinh ra trên máy bạn nhưng KHÔNG được nộp/đẩy lên GitHub:** `.env`, `.venv/`, `orders.db`, `.demo-*.pid`, `.demo-*.log`, `.git/`, `__pycache__/`.
 
-## 3. Chuẩn bị tài khoản ngrok → VNPAY (không cần START rồi STOP giữa chừng)
+## 3. Chuẩn bị tài khoản ngrok → VNPAY
 
 1. Cài Python: [Windows](https://www.python.org/downloads/windows/) hoặc [macOS](https://www.python.org/downloads/macos/).
 2. Đăng ký ngrok tại <https://dashboard.ngrok.com/signup>. Vào [Domains](https://dashboard.ngrok.com/domains), sao chép tên miền HTTPS được tài khoản cấp. Ví dụ dạng `https://TEN-MIEN.ngrok-free.dev`. **Không tự bịa tên miền**.
